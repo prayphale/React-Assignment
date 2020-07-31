@@ -1,26 +1,47 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import {connect} from 'react-redux';
 import './App.css';
+import UserDetails from './components/user/UserDetails/userDetails';
+import Search from './components/search/search';
+import  axios from 'axios';
+import ProfileInfo from './components/userProfile/profileInfo/profileInfo';
+
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+        
+    const [getUsers, setUsers] = useState([]);
+
+    useEffect(() => {
+        axios.get("https://api.github.com/users")
+            .then(result => 
+            setUsers(result.data)
+            );
+    }, []);
+   
+    return (
+        <div className="App">        
+
+                <Search />
+                <div className="container "> 
+                    {/* Fetch all list of users from GitHub */}
+                    {
+                        getUsers.map(user => (
+                            <UserDetails usersList= {user} />
+                        ))
+                    }      
+                </div>
+                <ProfileInfo />
+        </div>
+    );
 }
 
-export default App;
+const mapStateToProps = (state) => {
+    return {
+        username:  state.username,
+        userProfile: state.userProfile,
+        repos: state.repos
+
+    }
+}
+
+export default connect(mapStateToProps)(App);
